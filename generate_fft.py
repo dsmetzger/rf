@@ -33,9 +33,9 @@ for k in range(0,N):
 
 #factor = 2.0*math.pi/float(N);
 #factor1 = 0.0;
-for k in range 0:N:
+for k in range(0,N):
     #factor1 = float(k)*factor
-    for n in range 0:N:
+    for n in range(0,N):
         out_ix = (n*k)%N
         key_to_str = str(n)+"_"+str(k*n%N)
         exp_strs[key_to_str] += "out["+str(2*out_ix)+"] = out_real;out["+str(2*out_ix+1)+"] = out_imag;"
@@ -46,13 +46,13 @@ print "int n = 0;int k = 0;float re,im;float in_real,in_imag;float out_real,out_
 
 factor = 2.0*math.pi/float(N);
 factor1 = 0.0;
-for n in range 0:N:
+for n in range(0,N):
     factor1 = float(n)*factor
     print "in_real = xn[n];++n;in_imag = xn[n];++n;"
     for k in range(0,N):
         key_to_str = str(n)+"_"+str(k*n%N)
-        real = cos(k*factor1)
-        imag = -sin(k*factor1)
+        real = math.cos(k*factor1)
+        imag = -math.sin(k*factor1)
         print "out_real = "+str(real)+"*in_real - "+str(imag)+"*in_imag"
         print "out_imag = "+str(real)+"*in_imag + "+str(imag)+"*in_real"
         
