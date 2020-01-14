@@ -12,19 +12,26 @@ layer = 0
 layers = [[]]
 
 step = 1
-while(N!=1):
+N1 = N
+while(N1!=1):
     if (layer ==0):
         for k in range(0,N):
             layers[layer].append(k)
             #print "X["+str(k)+"]=x["+str(k)+"];"
     else:
         layers.append([])
-        for x in range(0,step):
-            for k in range(0,N,step):
-                layers[layer].append(layers[layer-1][])
+        #even
+        for k in range(0,N,2):
+            layers[layer].append(layers[layer-1][k])
+        #odd
+        for k in range(1,N,2):
+            layers[layer].append(layers[layer-1][k])
     layer+=1
-    N/=2
-    step*=2
+    N1/=2
 
 
+while(N1!=N):
+    
+    layer-=1
+    N1*=2
 print "}"
