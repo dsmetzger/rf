@@ -40,7 +40,7 @@ std::cout<< "N2 "<<N << std::endl;
 std::cout<< "s "<<s << std::endl;
         for (int k = 0; k<N/2; k+=1){
 //std::cout<< "k "<<k << std::endl;
-std::cout<< "Xe "<<&X[k*s] << std::endl;
+std::cout<< "Xe "<<&X[2*k*s] << std::endl;
 std::cout<< "Xo "<<&X[2*k*s+s] << std::endl;
             t = X[2*k*s];
             X[k*s] = t + thexp(2*M_PI* k/N)*X[2*k*s+s];
