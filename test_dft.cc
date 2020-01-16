@@ -41,10 +41,10 @@ std::cout<< "s "<<s << std::endl;
         for (int k = 0; k<N/2; k+=1){
 //std::cout<< "k "<<k << std::endl;
 std::cout<< "Xe "<<&X[k*s] << std::endl;
-std::cout<< "Xo "<<&X[k*s+s] << std::endl;
-            t = X[k*s];
-            X[k*s] = t + thexp(2*M_PI* k/N)*X[k*s+N*s/2];
-            X[k*s+N*s/2] = t - thexp(2*M_PI* k/N)*X[k*s+N*s/2];
+std::cout<< "Xo "<<&X[2*k*s+s] << std::endl;
+            t = X[2*k*s];
+            X[k*s] = t + thexp(2*M_PI* k/N)*X[2*k*s+s];
+            X[2*k*s+s*N/2] = t - thexp(2*M_PI* k/N)*X[2*k*s+s];
         }
     }
 }
@@ -57,7 +57,7 @@ int main(){
 	std::vector<std::complex<float> > o1(N,1.0);
 
 	auto start_time = Clock::now();
-	for (int x=0; x<10; ++x){
+	for (int x=0; x<1; ++x){
 		brute_dft(&input_vec[0], &o0[0], N);
 	}
 	auto end_time = Clock::now();
