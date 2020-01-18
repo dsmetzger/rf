@@ -1,15 +1,18 @@
 #include <iostream>
 #include <vector>
 #include <complex>
-#include "dft_32.h"
+
 #include <math.h>
+#include "fft1.h"
+
+#include "fft_16.h"
+//#include "fft_4096.h"
 
 #include <chrono>
 
 typedef std::chrono::high_resolution_clock Clock;
 
 void brute_dft(std::complex<float>* x, std::complex<float>* Xk, int N){
-	int idx = 0;
 	float factor = 2.0*M_PI/float(N);
 	float factor1; 
 	for (int k=0; k<N; ++k){
@@ -50,49 +53,55 @@ std::cout<< "Xo "<<&X[2*k*s+s] << std::endl;
 }
 
 int main(){
-	int N = 4;
-	std::vector<std::complex<float> > input_vec(N,1.0);
-	input_vec[N/2] = float(N);
-	std::vector<std::complex<float> > o0(N,1.0);
+	int N = 16;
+        
+	std::vector<std::complex<float> > input_vec(N,1.1);
+	input_vec[N/2] = std::complex<float>(N, .1);
 	std::vector<std::complex<float> > o1(N,1.0);
+
+    //std::cout<< "X0 "<<&o1[0] << std::endl;
+    //std::cout<< "X1 "<<&o1[1] << std::endl;
 
 	auto start_time = Clock::now();
 	for (int x=0; x<1; ++x){
-		brute_dft(&input_vec[0], &o0[0], N);
+		brute_dft(&input_vec[0], &o1[0], N);
 	}
 	auto end_time = Clock::now();
-	std::cout << "Time difference:"
-      << std::chrono::duration_cast<std::chrono::nanoseconds>(end_time - start_time).count() << " nanoseconds" << std::endl;
+	std::cout << "Time difference:" << std::chrono::duration_cast<std::chrono::nanoseconds>(end_time - start_time).count() << " nanoseconds" << std::endl;
 
-	for (int x=0; x<N; ++x){
-		std::cout<<o0[x]<<",";
-	}
-	std::cout<<std::endl;std::cout<<std::endl;
-
-std::cout<< "X0 "<<&o1[0] << std::endl;
-std::cout<< "X1 "<<&o1[1] << std::endl;
-
-
-	start_time = Clock::now();
-	for (int x=0; x<1; ++x){
-		ditfft2(&input_vec[0], &o1[0], N, 1);
-	}
-	end_time = Clock::now();
-	std::cout << "Time difference:"
-      << std::chrono::duration_cast<std::chrono::nanoseconds>(end_time - start_time).count() << " nanoseconds" << std::endl;
-/*
-    start_time = Clock::now();
-	for (int x=0; x<10; ++x){
-		fft_32((float *)&input_vec[0], (float *)&o1[0]);
-	}
-	end_time = Clock::now();
-	std::cout << "Time difference:"
-      << std::chrono::duration_cast<std::chrono::nanoseconds>(end_time - start_time).count() << " nanoseconds" << std::endl;
-*/
 	for (int x=0; x<N; ++x){
 		std::cout<<o1[x]<<",";
 	}
-	std::cout<<std::endl;
+	std::cout<<std::endl;std::cout<<std::endl;
+
+	start_time = Clock::now();
+	for (int x=0; x<1; ++x){
+        //ditfft2(&input_vec[0], &o1[0], N, 1);
+        //fft_4096((float*)&input_vec[0], (float*)&o1[0]);
+        fft_16((float*)&input_vec[0], (float*)&o1[0]);
+	}
+	end_time = Clock::now();
+	std::cout << "Time difference:" << std::chrono::duration_cast<std::chrono::nanoseconds>(end_time - start_time).count() << " nanoseconds" << std::endl;
+
+    for (int x=0; x<N; ++x){
+		std::cout<<o1[x]<<",";
+	}
+	std::cout<<std::endl;std::cout<<std::endl;
+
+    return 0;
+    /*
+    start_time = Clock::now();
+	for (int x=0; x<1; ++x){
+		rad2FFT(N, &input_vec[0], &o1[0]);
+	}
+	end_time = Clock::now();
+	std::cout << "Time difference:" << std::chrono::duration_cast<std::chrono::nanoseconds>(end_time - start_time).count() << " nanoseconds" << std::endl;
+
+	for (int x=0; x<N; ++x){
+		std::cout<<o1[x]<<",";
+	}
+	std::cout<<std::endl;std::cout<<std::endl;
 
 	return 0;
+	*/
 }
