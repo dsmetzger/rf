@@ -20,7 +20,7 @@ bool isPwrTwo(int N, int *M)
     return true;
 }
 
-int get_index(void* val, void* base){
+int get_index(const void* val, const void* base){
     //cout<<"*********"<<endl;
     //cout<<val<<endl;
     //cout<<base<<endl;
@@ -130,8 +130,8 @@ void print_rad2FFT(int N, std::complex<float> *x, std::complex<float> *DFT)
                     //CMult(pLo, &WN, &TEMP);          // Perform complex multiplication of Lovalue with Wn
                     TEMP.real( (pLo->real() * WN.real()) - (pLo->imag() * WN.imag()));
                     TEMP.imag( (pLo->real() * WN.imag()) + (pLo->imag() * WN.real()));
-                    cout<<"te_re"<<"="<< "X["<<get_index(pLo, base_X)<<"]"<<"*("<<WN.real()<<")-"<< "X["<<get_index(pLo+1, base_X)<<"]"<<"*("<<WN.imag() << ");" <<endl;
-                    cout<<"te_im"<<"="<< "X["<<get_index(pLo, base_X)<<"]"<<"*("<<WN.imag()<<")+"<< "X["<<get_index(pLo+1, base_X)<<"]"<<"*("<<WN.real() << ");" <<endl;
+                    cout<<"te_re"<<"="<< "(X["<<get_index(pLo, base_X)<<"]"<<"*("<<WN.real()<<"))-"<< "(X["<<get_index(pLo, base_X)+1<<"]"<<"*("<<WN.imag() << "));" <<endl;
+                    cout<<"te_im"<<"="<< "(X["<<get_index(pLo, base_X)<<"]"<<"*("<<WN.imag()<<"))+"<< "(X["<<get_index(pLo, base_X)+1<<"]"<<"*("<<WN.real() << "));" <<endl;
 
                     //CSub (pHi, &TEMP, pLo);
                     pLo->real( pHi->real() - TEMP.real());       // Find new Lovalue (complex subtraction)
@@ -171,7 +171,7 @@ void print_rad2FFT(int N, std::complex<float> *x, std::complex<float> *DFT)
     cout << "}"<<endl;
 }
 
-void rad2FFT(int N, std::complex<float> *x, std::complex<float> *DFT)
+void rad2FFT(int N, std::complex<float> *x, std::complex<float> *DFT, int fake_sin = 0)
 {
     int M = 0;
 
@@ -237,12 +237,18 @@ void rad2FFT(int N, std::complex<float> *x, std::complex<float> *DFT)
         TwoPi_NP = TwoPi_N*P;
 
         for (j = 0; j < BWidth; j++) // Loop for j calculations per butterfly
-        {
-            if (j != 0)              // Save on calculation if R = 0, as WN^0 = (1 + j0)
-            {
-                //WN.real() = cos(TwoPi_NP*j)
-                WN.real(  cos(TwoPi_NP*j));     // Calculate Wn (Real and Imaginary)
-                WN.imag( -sin(TwoPi_NP*j));
+        {   
+            if (fake_sin !=1){
+                if (j != 0)              // Save on calculation if R = 0, as WN^0 = (1 + j0)
+                {
+                    //WN.real() = cos(TwoPi_NP*j)
+                    WN.real(  cos(TwoPi_NP*j));     // Calculate Wn (Real and Imaginary)
+                    WN.imag( -sin(TwoPi_NP*j));
+                }
+                
+            }else{
+                WN.real( pX->real());
+                WN.imag( pX->imag());
             }
 
             for (HiIndex = j; HiIndex < N; HiIndex += BSep) // Loop for HiIndex Step BSep butterflies per stage

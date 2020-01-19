@@ -46,7 +46,7 @@ std::cout<< "Xo "<<&X[2*k*s+s] << std::endl;
 }
 
 int main(){
-	int N = 16;
+	int N = 8*4096;
         
 	std::vector<std::complex<float> > input_vec(N,1.1);
 	input_vec[N/2] = std::complex<float>(N, .1);

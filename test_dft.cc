@@ -6,7 +6,7 @@
 #include "fft1.h"
 
 #include "fft_16.h"
-//#include "fft_4096.h"
+#include "fft_4096.h"
 
 #include <chrono>
 
@@ -53,8 +53,8 @@ std::cout<< "Xo "<<&X[2*k*s+s] << std::endl;
 }
 
 int main(){
-	int N = 16;
-        
+	int N = 4096;
+    int iters = 1;
 	std::vector<std::complex<float> > input_vec(N,1.1);
 	input_vec[N/2] = std::complex<float>(N, .1);
 	std::vector<std::complex<float> > o1(N,1.0);
@@ -63,45 +63,45 @@ int main(){
     //std::cout<< "X1 "<<&o1[1] << std::endl;
 
 	auto start_time = Clock::now();
-	for (int x=0; x<1; ++x){
+	for (int x=0; x<iters; ++x){
 		brute_dft(&input_vec[0], &o1[0], N);
 	}
 	auto end_time = Clock::now();
 	std::cout << "Time difference:" << std::chrono::duration_cast<std::chrono::nanoseconds>(end_time - start_time).count() << " nanoseconds" << std::endl;
 
 	for (int x=0; x<N; ++x){
-		std::cout<<o1[x]<<",";
+		//std::cout<<o1[x]<<",";
 	}
 	std::cout<<std::endl;std::cout<<std::endl;
 
 	start_time = Clock::now();
-	for (int x=0; x<1; ++x){
+	for (int x=0; x<iters; ++x){
         //ditfft2(&input_vec[0], &o1[0], N, 1);
-        //fft_4096((float*)&input_vec[0], (float*)&o1[0]);
-        fft_16((float*)&input_vec[0], (float*)&o1[0]);
+        fft_4096((float*)&input_vec[0], (float*)&o1[0]);
+        //fft_16((float*)&input_vec[0], (float*)&o1[0]);
 	}
 	end_time = Clock::now();
 	std::cout << "Time difference:" << std::chrono::duration_cast<std::chrono::nanoseconds>(end_time - start_time).count() << " nanoseconds" << std::endl;
 
     for (int x=0; x<N; ++x){
-		std::cout<<o1[x]<<",";
+		//std::cout<<o1[x]<<",";
 	}
 	std::cout<<std::endl;std::cout<<std::endl;
 
-    return 0;
-    /*
+    //return 0;
+    
     start_time = Clock::now();
-	for (int x=0; x<1; ++x){
-		rad2FFT(N, &input_vec[0], &o1[0]);
+	for (int x=0; x<iters; ++x){
+		rad2FFT(N, &input_vec[0], &o1[0],1);
 	}
 	end_time = Clock::now();
 	std::cout << "Time difference:" << std::chrono::duration_cast<std::chrono::nanoseconds>(end_time - start_time).count() << " nanoseconds" << std::endl;
 
 	for (int x=0; x<N; ++x){
-		std::cout<<o1[x]<<",";
+		//std::cout<<o1[x]<<",";
 	}
 	std::cout<<std::endl;std::cout<<std::endl;
 
 	return 0;
-	*/
+	/**/
 }
