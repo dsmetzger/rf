@@ -3,9 +3,8 @@
 #include <complex>
 
 #include <math.h>
-#include "fft1.h"
 
-#include "fft_16.h"
+
 #include "fft_32768.h"
 
 #include <chrono>
@@ -53,14 +52,12 @@ std::cout<< "Xo "<<&X[2*k*s+s] << std::endl;
 }
 
 int main(){
-	int N = 4096;
+	int N = 32768;
     int iters = 1;
 	std::vector<std::complex<float> > input_vec(N,1.1);
 	input_vec[N/2] = std::complex<float>(N, .1);
 	std::vector<std::complex<float> > o1(N,1.0);
 
-    //std::cout<< "X0 "<<&o1[0] << std::endl;
-    //std::cout<< "X1 "<<&o1[1] << std::endl;
 
 	auto start_time = Clock::now();
 	for (int x=0; x<iters; ++x){
