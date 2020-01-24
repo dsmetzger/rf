@@ -30,11 +30,17 @@ int get_index(const void* val, const void* base){
 }
 
 
+int get_int(float val){
+    return abs(int(1.0e9*val));
+}
+
+
 void print_rad2FFT(int N, std::complex<float> *x, std::complex<float> *DFT)
 {
     int M = 0;
     cout << "void fft_"<<N<<"(float* x, float* X){"<<endl;
     cout << "float te_re, te_im;"<<endl;
+    cout << "float te_mula, te_mulb;"<<endl;
     // Check if power of two. If not, exit        
     if (!isPwrTwo(N, &M))
         throw "Rad2FFT(): N must be a power of 2 for Radix FFT";
@@ -98,7 +104,7 @@ void print_rad2FFT(int N, std::complex<float> *x, std::complex<float> *DFT)
         cout<<"X["<<get_index(DFT, base_X)+1<<"]"<<"="<< "x["<< get_index(pX, base_x)+1<<"]" << ";"<<endl;
     }
 
-    cout.precision(14);
+    cout.precision(10);
     
     // FFT Computation by butterfly calculation
     for (stage = 1; stage <= M; stage++) // Loop for M stages, where 2^M = N
@@ -130,19 +136,63 @@ void print_rad2FFT(int N, std::complex<float> *x, std::complex<float> *DFT)
                     //CMult(pLo, &WN, &TEMP);          // Perform complex multiplication of Lovalue with Wn
                     TEMP.real( (pLo->real() * WN.real()) - (pLo->imag() * WN.imag()));
                     TEMP.imag( (pLo->real() * WN.imag()) + (pLo->imag() * WN.real()));
-                    cout<<"te_re"<<"="<< "(X["<<get_index(pLo, base_X)<<"]"<<"*("<<WN.real()<<"))-"<< "(X["<<get_index(pLo, base_X)+1<<"]"<<"*("<<WN.imag() << "));" <<endl;
-                    cout<<"te_im"<<"="<< "(X["<<get_index(pLo, base_X)<<"]"<<"*("<<WN.imag()<<"))+"<< "(X["<<get_index(pLo, base_X)+1<<"]"<<"*("<<WN.real() << "));" <<endl;
-
+                    
                     //CSub (pHi, &TEMP, pLo);
                     pLo->real( pHi->real() - TEMP.real());       // Find new Lovalue (complex subtraction)
                     pLo->imag( pHi->imag() - TEMP.imag());
-                    cout<<"X["<<get_index(pLo, base_X)<<"]"<<"="<< "X["<<get_index(pHi, base_X)<<"]"<<"-"<< "te_re" << ";" <<endl;
-                    cout<<"X["<<get_index(pLo, base_X)+1<<"]"<<"="<< "X["<<get_index(pHi, base_X)+1<<"]"<<"-"<< "te_im" << ";" <<endl;
-
-
+                    
                     //CAdd (pHi, &TEMP, pHi);          // Find new Hivalue (complex addition)
                     pHi->real( (pHi->real() + TEMP.real()));
                     pHi->imag( (pHi->imag() + TEMP.imag()));
+                    
+                    if (get_int(WN.real())==get_int(WN.imag())){
+                        if (WN.imag()>0.0){
+                            if (WN.real()>0.0){
+                                cout<<"te_mula"<<"="<< "(X["<<get_index(pLo, base_X)<<"]"<<"*("<<abs(WN.real())<<"));" <<endl;
+                                cout<<"te_mulb"<<"="<< "(X["<<get_index(pLo, base_X)+1<<"]"<<"*("<<abs(WN.real())<<"));" <<endl;
+                                cout<<"te_re=te_mula-te_mulb;" <<endl;
+                                cout<<"te_im=te_mula+te_mulb;" <<endl;
+                            }else{
+                                cout<<"te_mula"<<"="<< "(X["<<get_index(pLo, base_X)<<"]"<<"*("<<abs(WN.real())<<"));" <<endl;
+                                cout<<"te_mulb"<<"="<< "(X["<<get_index(pLo, base_X)+1<<"]"<<"*("<<abs(WN.real())<<"));" <<endl;
+                                cout<<"te_re=te_mulb-te_mula;" <<endl;
+                                cout<<"te_im=te_mula-te_mulb;" <<endl;
+                            }
+                        }else{
+                            if (WN.real()>0.0){
+                                cout<<"te_mula"<<"="<< "(X["<<get_index(pLo, base_X)<<"]"<<"*("<<abs(WN.real())<<"));" <<endl;
+                                cout<<"te_mulb"<<"="<< "(X["<<get_index(pLo, base_X)+1<<"]"<<"*("<<abs(WN.real())<<"));" <<endl;
+                                cout<<"te_re=te_mula+te_mulb;" <<endl;
+                                cout<<"te_im=te_mulb-te_mula;" <<endl;
+                            }else{
+                                cout<<"te_mula"<<"="<< "(X["<<get_index(pLo, base_X)<<"]"<<"*("<<(WN.real())<<"));" <<endl;
+                                cout<<"te_mulb"<<"="<< "(X["<<get_index(pLo, base_X)+1<<"]"<<"*("<<(WN.real())<<"));" <<endl;
+                                cout<<"te_re=te_mula-te_mulb;" <<endl;
+                                cout<<"te_im=te_mula+te_mulb;" <<endl;
+                            }
+                        }
+                    }else if (get_int(WN.real())==0){
+                        if (WN.imag()>0.0){
+                            cout<< "bad"<<endl;
+                            return;
+                        }
+                        cout<<"te_re"<<"="<< "X["<<get_index(pLo, base_X)+1<<"];" <<endl;
+                        cout<<"te_im"<<"="<< "-X["<<get_index(pLo, base_X)<<"];" <<endl;
+                    }else if (get_int(WN.imag())==0){
+                        if (WN.real()>0.0){
+                            cout<< "bad"<<endl;
+                            return;
+                        }
+                        cout<<"te_re"<<"="<< "-X["<<get_index(pLo, base_X)<<"];"<<endl;
+                        cout<<"te_im"<<"="<< "-X["<<get_index(pLo, base_X)+1<<"];" <<endl;
+                    }else{
+                        cout<<"te_re"<<"="<< "(X["<<get_index(pLo, base_X)<<"]"<<"*("<<WN.real()<<"))-"<< "(X["<<get_index(pLo, base_X)+1<<"]"<<"*("<<WN.imag() << "));" <<endl;
+                        cout<<"te_im"<<"="<< "(X["<<get_index(pLo, base_X)<<"]"<<"*("<<WN.imag()<<"))+"<< "(X["<<get_index(pLo, base_X)+1<<"]"<<"*("<<WN.real() << "));" <<endl;
+                    }
+                    
+                    cout<<"X["<<get_index(pLo, base_X)<<"]"<<"="<< "X["<<get_index(pHi, base_X)<<"]"<<"-"<< "te_re" << ";" <<endl;
+                    cout<<"X["<<get_index(pLo, base_X)+1<<"]"<<"="<< "X["<<get_index(pHi, base_X)+1<<"]"<<"-"<< "te_im" << ";" <<endl;
+                    
                     cout<<"X["<<get_index(pHi, base_X)<<"]"<<"="<< "X["<<get_index(pHi, base_X)<<"]"<<"+"<< "te_re" << ";" <<endl;
                     cout<<"X["<<get_index(pHi, base_X)+1<<"]"<<"="<< "X["<<get_index(pHi, base_X)+1<<"]"<<"+"<< "te_im" << ";" <<endl;
                 }
